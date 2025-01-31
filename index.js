@@ -17,26 +17,21 @@ const SHAPES = {
 // Function to place a piece in the grid at the given x position
 function placePiece(grid, piece, x) {
     let shape = SHAPES[piece];
+    if (shape.some(([dx]) => x + dx >= WIDTH)) return; // Prevent out-of-bounds placement
 
-    // Prevent out-of-bounds placement
-    if (shape.some(([dx]) => x + dx >= WIDTH)) return;
-
-    let maxY = HEIGHT - 1; // Start from the bottom of the grid
+    let minY = HEIGHT;
 
     // Find the lowest position where the piece can be placed
-    for (let y = HEIGHT - 1; y >= 0; y--) {
-        if (shape.every(([dx, dy]) => y + dy < HEIGHT && x + dx < WIDTH && grid[y + dy][x + dx] === 0)) {
-            maxY = y;
-        } else {
+    for (let y = 0; y < HEIGHT; y++) {
+        if (shape.some(([dx, dy]) => y + dy >= HEIGHT || grid[y + dy][x + dx] === 1)) {
+            minY = y - 1;
             break;
         }
     }
 
     // Place the piece on the grid
     shape.forEach(([dx, dy]) => {
-        if (maxY + dy < HEIGHT && x + dx < WIDTH) {
-            grid[maxY + dy][x + dx] = 1;
-        }
+        grid[minY + dy][x + dx] = 1;
     });
 
     // Remove full rows if any
